@@ -1,5 +1,12 @@
-#CC     ?= arm-linux-gcc
-#CFLAGS ?= -march=armv4t
+## File: Makefile.in
+## -----------------
+
+# VPATH for make to search source files
+VPATH   := @srcdir@
+
+CC      := @CC@
+CFLAGS  := @CFLAGS@
+LDFLAGS := @LDFLAGS@
 
 programs := hello
 sources  := hello.c
