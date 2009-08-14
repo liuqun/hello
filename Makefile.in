@@ -4,24 +4,33 @@
 # VPATH for make to search source files
 VPATH   := @srcdir@
 
+# Compiler options
 CC      := @CC@
 CFLAGS  := @CFLAGS@
 LDFLAGS := @LDFLAGS@
 
+# Project files
 programs := hello
 sources  := hello.c
 objects  := hello.o
 
+
+#------------------------------
+# All building dependences.
 .PHONY: all
-.PHONY: clean
-
 all: $(programs)
-
+hello: hello.o
+hello.o: hello.c
+#------------------------------
+# Default building rules.
+%: %.o
+	$(LINK.o) $^ -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
-%: %.o
-	$(LINK.o) $< -o $@
-
+#------------------------------
+# make clean
+.PHONY: clean
 clean:
 	$(RM) $(programs) $(objects)
+#------------------------------
 
