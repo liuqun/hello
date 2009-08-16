@@ -1,0 +1,12 @@
+#! /bin/sh
+
+build_dir=`pwd`
+
+cd .. && autoconf &&
+
+cd $build_dir &&
+env CC=gcc CFLAGS="-g -Wall -Wextra" \
+../configure &&
+
+exit $?
+
