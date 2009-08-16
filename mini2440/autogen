@@ -1,12 +1,17 @@
 #! /bin/sh
 
 build_dir=`pwd`
+source_dir=`pwd`/..
 
-cd .. && autoconf &&
+cd $source_dir &&
+autoconf &&
 
 cd $build_dir &&
-env CC=/usr/local/arm/3.4.1/bin/arm-linux-gcc \
-../configure --build=i386-linux --host=arm-linux &&
+$source_dir/configure --build=i686-pc-linux --host=arm-linux &&
+
+# 注：只保留生成的Makefile，删除其他中间文件
+rm -rf $source_dir/{autom4te.cache,configure}
+rm -rf $build_dir/{config.log,config.status}
 
 exit $?
 
