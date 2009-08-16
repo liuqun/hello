@@ -9,11 +9,14 @@ CC      := @CC@
 CFLAGS  := @CFLAGS@
 LDFLAGS := @LDFLAGS@
 
+# Useful commands
+MKDIR := mkdir -p
+RM := rm -rf
+
 # Project files
 programs := hello
 sources  := hello.c
 objects  := hello.o
-
 
 #------------------------------
 # All building dependences.
@@ -33,4 +36,8 @@ hello.o: hello.c
 clean:
 	$(RM) $(programs) $(objects)
 #------------------------------
+# make distclean
+.PHONY: distclean
+distclean: clean
+	$(RM) autom4te.cache configure config.log config.status Makefile
 
