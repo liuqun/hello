@@ -4,9 +4,6 @@
 # VPATH for make to search source files
 VPATH := @srcdir@
 
-# PATH for make to search compiler toolchains
-PATH := /usr/local/arm/3.4.1/bin:$(PATH)
-
 # Compiler options
 CC := @CC@
 CFLAGS := @CFLAGS@
