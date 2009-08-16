@@ -1,0 +1,12 @@
+#! /bin/sh
+
+build_dir=`pwd`
+
+cd .. && autoconf &&
+
+cd $build_dir &&
+env CC=/usr/local/arm/3.4.1/bin/arm-linux-gcc \
+../configure --build=i386-linux --host=arm-linux &&
+
+exit $?
+
