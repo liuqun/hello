@@ -1,8 +1,6 @@
 # @configure_input@
 #
 
-# VPATH for make to search source files
-VPATH := @srcdir@
 
 # Compiler options
 CC := @CC@
@@ -12,17 +10,18 @@ CFLAGS := @CFLAGS@
 MKDIR := mkdir -p
 RM := rm -rf
 
-# Project files
-programs := hello
-sources  := hello.c
-objects  := hello.o
+# Configure project files
+top_level_source_dir := @srcdir@
+VPATH := $(top_level_source_dir)
+execultable_files :=
+source_files  :=
+object_files  :=
+-include $(top_level_source_dir)/*.mk
 
 #------------------------------
 # All building dependences.
 .PHONY: all
-all: $(programs)
-hello: hello.o
-hello.o: hello.c
+all: $(execultable_files)
 #------------------------------
 # Default building rules.
 %: %.o
@@ -33,7 +32,7 @@ hello.o: hello.c
 # make clean
 .PHONY: clean
 clean:
-	$(RM) $(programs) $(objects)
+	$(RM) $(execultable_files) $(object_files)
 #------------------------------
 # make distclean
 .PHONY: distclean
