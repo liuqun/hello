@@ -32,7 +32,7 @@ all: $(execultable_files)
 # make clean
 .PHONY: clean
 clean:
-	$(RM) $(execultable_files) $(object_files)
+	$(RM) $(execultable_files:=@EXEEXT@) $(object_files)
 #------------------------------
 # make distclean
 .PHONY: distclean
