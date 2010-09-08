@@ -25,7 +25,7 @@ all: $(execultable_files)
 #------------------------------
 # Default building rules.
 %: %.o
-	$(LINK.o) $^ -o $@
+	$(LINK.o) $^ $(LDLIBS) -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
 #------------------------------
