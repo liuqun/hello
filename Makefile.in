@@ -5,6 +5,8 @@
 # Compiler options
 CC := @CC@
 CFLAGS := @CFLAGS@
+LDFLAGS := @LDFLAGS@
+EXEEXT := @EXEEXT@
 
 # Useful commands
 MKDIR := mkdir -p
@@ -24,7 +26,7 @@ object_files  :=
 all: $(execultable_files)
 #------------------------------
 # Default building rules.
-%: %.o
+%@EXEEXT@: %.o
 	$(LINK.o) $^ $(LDLIBS) -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
@@ -32,7 +34,7 @@ all: $(execultable_files)
 # make clean
 .PHONY: clean
 clean:
-	$(RM) $(execultable_files:=@EXEEXT@) $(object_files)
+	$(RM) $(execultable_files) $(object_files)
 #------------------------------
 # make distclean
 .PHONY: distclean
