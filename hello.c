@@ -1,20 +1,46 @@
 ﻿
 #include <stdio.h>
 #include <stdlib.h>
+#include <glib.h>
 #include <gtk/gtk.h>
 
-static void SendHelloWorld(void *p);
+static void SendHelloWorld(gpointer);
+
+/* Create a list of entries which are passed to the Action constructor.
+ * This is a huge convenience over building Actions by hand.
+ */
+const GtkActionEntry entries[] = {
+  /**********************************/
+  { "FileMenuAction", NULL,
+    "_File", NULL,
+    "",
+    NULL
+  },
+  /**********************************/
+  { "SendAction", GTK_STOCK_EXECUTE,
+    "_Send", "<Ctrl>S",
+    "Send hello world to console",
+    G_CALLBACK(SendHelloWorld)
+  },
+  /**********************************/
+  { "QuitAction", GTK_STOCK_QUIT,
+    "_Quit", "<Ctrl>Q",
+    "Quit",
+    G_CALLBACK(gtk_main_quit)
+  },
+  /**********************************/
+};
 
 int main(int argc, char *argv[])
 {
-	GtkWidget *win = NULL;
-	GtkWidget *vbox = NULL;
-	GtkWidget *menu_bar = NULL;
-	GtkWidget *root_menu = NULL;
-	GtkWidget *sub_menu = NULL;
-	GtkWidget *menu_item_sendmsg = NULL;
-	GtkWidget *menu_item_exit = NULL;
-
+	GtkWidget           *win = NULL;            /* The main window */
+	GtkWidget           *vbox = NULL;           /* Packing box for the menu and toolbars */
+	GtkWidget           *menubar = NULL;        /* The actual menubar */
+	GtkWidget           *toolbar = NULL;        /* The actual toolbar */
+	GtkActionGroup      *action_group = NULL;   /* Packing group for our Actions */
+	GtkUIManager        *menu_manager = NULL;   /* The magic widget! */
+	GError              *error = NULL;          /* For reporting exceptions or errors */
+	
 	/* Initialize GTK+ */
 	g_log_set_handler("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
 	gtk_init(&argc, &argv);
@@ -26,32 +52,49 @@ int main(int argc, char *argv[])
 	gtk_window_set_default_size(GTK_WINDOW(win), 400, 300);
 	gtk_widget_realize(win);
 
-	/* Create a vertical box */
+	/* Create a vertical box to hold menubar and toolbar */
 	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(win), vbox);
 
 	/* Create menus */
-	menu_bar = gtk_menu_bar_new();
+	action_group = gtk_action_group_new("TestActions");
+	gtk_action_group_set_translation_domain(action_group, "blah");
+	menu_manager = gtk_ui_manager_new();
+
+
+	/* Read in the UI from our XML file */
+	error = NULL;
+	gtk_ui_manager_add_ui_from_file(menu_manager, "hello.xml", &error);
+
+	if (error)
 	{
-		root_menu = gtk_menu_item_new_with_label("文件(F)");
-		{
-			sub_menu = gtk_menu_new();
-			{
-				menu_item_sendmsg = gtk_menu_item_new_with_label("发送“Hello world!”...");
-				menu_item_exit = gtk_menu_item_new_with_label("退出(X)");
-				gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu), menu_item_sendmsg);
-				gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu), menu_item_exit);
-			}
-			gtk_menu_item_set_submenu(GTK_MENU_ITEM(root_menu), sub_menu);
-		}
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), root_menu);
+	    g_message("building menus failed: %s", error->message);
+	    g_error_free(error);
+		error = NULL;
 	}
-	gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, FALSE, 0);
+
+
+	/* Pack up our objects:
+	 * vbox -> win
+	 * actions -> action_group
+	 * action_group -> menu_manager
+	 */
+	gtk_container_add(GTK_CONTAINER(win), vbox);
+	gtk_action_group_add_actions(action_group, entries, G_N_ELEMENTS(entries), NULL);
+	gtk_ui_manager_insert_action_group(menu_manager, action_group, 0);
+
+	/* Get the menubar and the toolbar and put them in the vertical packing box */
+	menubar = gtk_ui_manager_get_widget(menu_manager, "/MainMenuBar");
+	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+	toolbar = gtk_ui_manager_get_widget(menu_manager, "/MainToolbar");
+	gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+
 
 	/* Connect signals */
 	g_signal_connect(win, "destroy", gtk_main_quit, NULL);
-	g_signal_connect_swapped(menu_item_sendmsg, "activate", G_CALLBACK(SendHelloWorld), NULL);
-	g_signal_connect_swapped(menu_item_exit, "activate", gtk_main_quit, NULL);
+
+	/* Make sure that the accelerators work */
+	gtk_window_add_accel_group(GTK_WINDOW(win), 
+	                           gtk_ui_manager_get_accel_group(menu_manager));
 
 	/* Enter the main loop */
 	gtk_widget_show_all(win);
@@ -59,7 +102,8 @@ int main(int argc, char *argv[])
 	return (0);
 }
 
-static void SendHelloWorld(void *p)
+static void SendHelloWorld(gpointer p)
 {
-	fprintf(stderr, "Hello world!\n");
+	(void) p;
+	g_print("Hello world!\n");
 }
