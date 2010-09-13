@@ -32,13 +32,16 @@ object_files  :=
 #------------------------------
 # All building dependences.
 .PHONY: all
-all: $(execultable_files)
+all: Makefile $(execultable_files)
 #------------------------------
 # Default building rules.
 %@EXEEXT@: %.o
 	$(LINK.o) $^ $(LDLIBS) -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
+# Recreate Makefile when Makefile.in has been changed
+%: %.in
+	./config.status -q --file=$@
 #------------------------------
 # make clean
 .PHONY: clean
