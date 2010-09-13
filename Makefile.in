@@ -5,6 +5,17 @@
 # Compiler options
 CC := @CC@
 CFLAGS := @CFLAGS@
+LDFLAGS := @LDFLAGS@
+EXEEXT := @EXEEXT@
+
+# Library packages
+PKG_CONFIG := @PKG_CONFIG@
+ifndef PKG_CONFIG
+ $(error Can not find pkg-config, \
+         please try ./configure PKG_CONFIG=/opt/gtk/bin/pkg-config)
+endif
+GTK_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags gtk+-2.0)
+GTK_LIBS = $(shell "$(PKG_CONFIG)" --libs gtk+-2.0)
 
 # Useful commands
 MKDIR := mkdir -p
@@ -16,23 +27,29 @@ VPATH := $(top_level_source_dir)
 execultable_files :=
 source_files  :=
 object_files  :=
+
+# Load all building dependences...
+.PHONY: all
+all:
+
 -include $(top_level_source_dir)/*.mk
 
-#------------------------------
-# All building dependences.
-.PHONY: all
-all: $(execultable_files)
+all: Makefile $(execultable_files)
+
 #------------------------------
 # Default building rules.
-%: %.o
+%@EXEEXT@: %.o
 	$(LINK.o) $^ $(LDLIBS) -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
+# Recreate Makefile when Makefile.in has been changed
+%: %.in
+	./config.status -q --file=$@
 #------------------------------
 # make clean
 .PHONY: clean
 clean:
-	$(RM) $(execultable_files:=@EXEEXT@) $(object_files)
+	$(RM) $(execultable_files) $(object_files)
 #------------------------------
 # make distclean
 .PHONY: distclean
