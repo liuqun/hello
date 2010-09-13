@@ -27,12 +27,15 @@ VPATH := $(top_level_source_dir)
 execultable_files :=
 source_files  :=
 object_files  :=
+
+# Load all building dependences...
+.PHONY: all
+all:
+
 -include $(top_level_source_dir)/*.mk
 
-#------------------------------
-# All building dependences.
-.PHONY: all
 all: Makefile $(execultable_files)
+
 #------------------------------
 # Default building rules.
 %@EXEEXT@: %.o
