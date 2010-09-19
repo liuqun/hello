@@ -2,34 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <gtk/gtk.h>
+
+#include "hello.h"
 
 static void SendHelloWorld(gpointer);
 
-/* Create a list of entries which are passed to the Action constructor.
- * This is a huge convenience over building Actions by hand.
- */
-const GtkActionEntry entries[] = {
-  /**********************************/
-  { "FileMenuAction", NULL,
-    "_File", NULL,
-    "",
-    NULL
-  },
-  /**********************************/
-  { "SendAction", GTK_STOCK_EXECUTE,
-    "_Send", "<Ctrl>S",
-    "Send hello world to console",
-    G_CALLBACK(SendHelloWorld)
-  },
-  /**********************************/
-  { "QuitAction", GTK_STOCK_QUIT,
-    "_Quit", "<Ctrl>Q",
-    "Quit",
-    G_CALLBACK(gtk_main_quit)
-  },
-  /**********************************/
-};
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +20,11 @@ int main(int argc, char *argv[])
 	GtkUIManager        *menu_manager = NULL;   /* The magic widget! */
 	GError              *error = NULL;          /* For reporting exceptions or errors */
 	
+	/* Initialize translation text domain */
+	bindtextdomain(g_config.package_name, g_config.locale_dir);
+	bind_textdomain_codeset(g_config.package_name, "UTF-8");
+	textdomain(g_config.package_name);
+
 	/* Initialize GTK+ */
 	g_log_set_handler("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
 	gtk_init(&argc, &argv);
@@ -48,7 +32,7 @@ int main(int argc, char *argv[])
 
 	/* Create the main window */
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(win), "Hello World 小程序");
+	gtk_window_set_title(GTK_WINDOW(win), _("Hello World"));
 	gtk_window_set_default_size(GTK_WINDOW(win), 400, 300);
 	gtk_widget_realize(win);
 
@@ -57,9 +41,8 @@ int main(int argc, char *argv[])
 
 	/* Create menus */
 	action_group = gtk_action_group_new("TestActions");
-	gtk_action_group_set_translation_domain(action_group, "blah");
+	gtk_action_group_set_translation_domain(action_group, g_config.package_name);
 	menu_manager = gtk_ui_manager_new();
-
 
 	/* Read in the UI from our XML file */
 	error = NULL;
@@ -73,6 +56,30 @@ int main(int argc, char *argv[])
 	}
 
 
+	/* Create a list of entries which are passed to the Action constructor.
+	 * This is a huge convenience over building Actions by hand.
+	 */
+	const GtkActionEntry entries[] = {
+		/**********************************/
+		{ "FileMenuAction", NULL,
+		  _("_File"), NULL,
+		  _("File operations"),
+		  NULL
+		},
+		/**********************************/
+		{ "SendAction", GTK_STOCK_EXECUTE,
+		  _("_Send"), "<Ctrl>S",
+		  _("Send hello world to console"),
+		  G_CALLBACK(SendHelloWorld)
+		},
+		/**********************************/
+		{ "QuitAction", GTK_STOCK_QUIT,
+		  _("_Quit"), "<Ctrl>Q",
+		  _("Quit"),
+		  G_CALLBACK(gtk_main_quit)
+		},
+		/**********************************/
+	};
 	/* Pack up our objects:
 	 * vbox -> win
 	 * actions -> action_group
@@ -105,5 +112,5 @@ int main(int argc, char *argv[])
 static void SendHelloWorld(gpointer p)
 {
 	(void) p;
-	g_print("Hello world!\n");
+	g_print("%s\n", _("Hello world!"));
 }

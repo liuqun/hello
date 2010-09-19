@@ -20,6 +20,20 @@ GTK_LIBS = $(shell "$(PKG_CONFIG)" --libs gtk+-2.0)
 # Useful commands
 MKDIR := mkdir -p
 RM := rm -rf
+INSTALL := install
+INSTALL_PROGRAM := $(INSTALL)
+INSTALL_DATA := $(INSTALL) -m 644
+INSTALL_DIR := $(INSTALL) -d
+
+# Installation configuration
+PACKAGE_NAME := @PACKAGE_NAME@
+prefix := @prefix@
+exec_prefix := @exec_prefix@
+bindir := @bindir@
+datarootdir := @datarootdir@
+datadir := @datadir@
+localedir := @localedir@
+lang := zh_CN
 
 # Configure project files
 top_level_source_dir := @srcdir@
@@ -42,6 +56,10 @@ all: Makefile $(execultable_files)
 	$(LINK.o) $^ $(LDLIBS) -o $@
 %.o: %.c
 	$(COMPILE.c) $< -o $@
+%.pot: %.c
+	xgettext --from-code=UTF-8 -k_ $^ -o $@
+%.gmo: %.po
+	msgfmt $< -o $@
 # Recreate Makefile when Makefile.in has been changed
 %: %.in
 	./config.status -q --file=$@
@@ -55,4 +73,14 @@ clean:
 .PHONY: distclean
 distclean: clean
 	$(RM) autom4te.cache configure config.log config.status Makefile
+#------------------------------
+# make install
+.PHONY: install
+install: $(execultable_files) $(lang).gmo
+	echo $(lang)
+	$(INSTALL_DIR) $(bindir)
+	$(INSTALL_DIR) $(datadir)
+	$(INSTALL_DIR) $(localedir)/$(lang)/LC_MESSAGES
+	$(INSTALL_PROGRAM) $(execultable_files) $(bindir)
+	$(INSTALL_DATA) $(lang).gmo $(localedir)/$(lang)/LC_MESSAGES/$(PACKAGE_NAME).mo
 
