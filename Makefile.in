@@ -37,7 +37,12 @@ lang := zh_CN
 
 # Configure project files
 top_level_source_dir := @srcdir@
-VPATH := $(top_level_source_dir)
+srcdir := @srcdir@
+podir := $(top_level_source_dir)/po
+vpath %.c $(srcdir)
+vpath %.h $(srcdir)
+vpath %.po $(podir)
+vpath %.pot $(podir)
 executable_files :=
 source_files  :=
 object_files  :=
@@ -57,9 +62,9 @@ all: Makefile $(executable_files)
 %.o: %.c
 	$(COMPILE.c) $< -o $@
 %.pot: %.c
-	xgettext --from-code=UTF-8 -k_ $^ -o $@
+	xgettext --from-code=UTF-8 -k_ $^ --output-dir=$(podir) --output=$@
 %.gmo: %.po
-	msgfmt $< -o $@
+	msgfmt --directory=$(podir) $(notdir $<) -o $@
 # Recreate Makefile when Makefile.in has been changed
 %: %.in
 	./config.status -q --file=$@
@@ -72,12 +77,11 @@ clean:
 # make distclean
 .PHONY: distclean
 distclean: clean
-	$(RM) autom4te.cache configure config.log config.status Makefile
+	$(RM) config.log config.status Makefile
 #------------------------------
 # make install
 .PHONY: install
 install: $(executable_files) $(lang).gmo
-	echo $(lang)
 	$(INSTALL_DIR) $(bindir)
 	$(INSTALL_DIR) $(datadir)
 	$(INSTALL_DIR) $(localedir)/$(lang)/LC_MESSAGES

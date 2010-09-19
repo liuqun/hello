@@ -9,8 +9,12 @@ $(addsuffix $(EXEEXT), hello): $(local_object_files)
 hello.o: CFLAGS+=$(GTK_CFLAGS)
 config.o: CPPFLAGS+=-DLOCALEDIR=\"$(localedir)\"
 hello.pot: $(local_source_files)
-zh_CN.po: hello.pot
-	msgmerge --quiet --update $@ $<
+$(addsuffix .po, $(lang)): hello.pot
+	if test ! -f $(podir)/$@ ; then \
+		cd $(podir) ; \
+	 	msginit --locale=$(basename $(notdir $@)) --input=$(notdir $<) --output-file=$(notdir $@) ; \
+	fi
+	msgmerge --quiet --directory=$(podir) --update $(notdir $@) $(notdir $<)
 zh_CN.mo: zh_CN.po
 #-------------------------------------------------
 
