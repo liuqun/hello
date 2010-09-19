@@ -38,7 +38,7 @@ lang := zh_CN
 # Configure project files
 top_level_source_dir := @srcdir@
 VPATH := $(top_level_source_dir)
-execultable_files :=
+executable_files :=
 source_files  :=
 object_files  :=
 
@@ -48,7 +48,7 @@ all:
 
 -include $(top_level_source_dir)/*.mk
 
-all: Makefile $(execultable_files)
+all: Makefile $(executable_files)
 
 #------------------------------
 # Default building rules.
@@ -67,7 +67,7 @@ all: Makefile $(execultable_files)
 # make clean
 .PHONY: clean
 clean:
-	$(RM) $(execultable_files) $(object_files)
+	$(RM) $(executable_files) $(object_files)
 #------------------------------
 # make distclean
 .PHONY: distclean
@@ -76,11 +76,11 @@ distclean: clean
 #------------------------------
 # make install
 .PHONY: install
-install: $(execultable_files) $(lang).gmo
+install: $(executable_files) $(lang).gmo
 	echo $(lang)
 	$(INSTALL_DIR) $(bindir)
 	$(INSTALL_DIR) $(datadir)
 	$(INSTALL_DIR) $(localedir)/$(lang)/LC_MESSAGES
-	$(INSTALL_PROGRAM) $(execultable_files) $(bindir)
+	$(INSTALL_PROGRAM) $(executable_files) $(bindir)
 	$(INSTALL_DATA) $(lang).gmo $(localedir)/$(lang)/LC_MESSAGES/$(PACKAGE_NAME).mo
 
