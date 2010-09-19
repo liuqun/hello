@@ -12,10 +12,9 @@ hello.pot: $(local_source_files)
 $(addsuffix .po, $(lang)): hello.pot
 	if test ! -f $(podir)/$@ ; then \
 		cd $(podir) ; \
-	 	msginit --locale=$(basename $(notdir $@)) --input=$(notdir $<) --output-file=$(notdir $@) ; \
+	 	msginit --no-translator --locale=$(basename $(notdir $@)) --input=$(notdir $<) --output-file=$(notdir $@) ; \
 	fi
 	msgmerge --quiet --directory=$(podir) --update $(notdir $@) $(notdir $<)
-zh_CN.mo: zh_CN.po
 #-------------------------------------------------
 
 executable_files += $(local_executable_files)
