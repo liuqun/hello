@@ -85,6 +85,7 @@ install: install-exec install-data
 install-exec: $(executable_files)
 	$(INSTALL_DIR) $(bindir)
 	$(INSTALL_PROGRAM) $(executable_files) $(bindir)
+	$(INSTALL_DATA) hello.xml $(bindir)
 install-data: $(addsuffix .gmo, $(lang))
 	$(INSTALL_DIR) $(datadir)
 	for i in $^ ; do \
